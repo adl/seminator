@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019, 2020  The Seminator Authors
+# Copyright (C) 2019, 2020, 2024  The Seminator Authors
 #
 # This file is part of Seminator, a tool for semi-determinization of
 # omega automata.
@@ -38,8 +38,8 @@ AC_DEFUN([adl_CHECK_PYTHON],
   esac
   AC_CACHE_CHECK([for $am_display_PYTHON includes directory],
     [adl_cv_python_inc],
-    [adl_cv_python_inc=`$PYTHON -c "import sys; from distutils import sysconfig;]
-[sys.stdout.write(sysconfig.get_python_inc())" 2>/dev/null`])
+    [adl_cv_python_inc=`$PYTHON -c "import sys, sysconfig;]
+[sys.stdout.write(sysconfig.get_path('include'))" 2>/dev/null`])
   AC_SUBST([PYTHONINC], [$adl_cv_python_inc])
   adl_save_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$adl_save_CPPFLAGS -I$PYTHONINC"
@@ -107,7 +107,7 @@ if test x"${enable_20}" = xyes; then
     ${stdpass-false} && break
   done
   if ! "${stdpass-false}"; then
-    AC_ERROR([unable to turn on C++20 mode with this compiler])
+    AC_MSG_ERROR(unable to turn on C++20 mode with this compiler)
   fi
 else
   for f in -std=c++17 '-std=c++17 -stdlib=libc++' -std=c++1z
@@ -117,7 +117,7 @@ else
     ${stdpass-false} && break
   done
   if ! "${stdpass-false}"; then
-    AC_ERROR([unable to turn on C++17 mode with this compiler])
+    AC_MSG_ERROR(unable to turn on C++17 mode with this compiler)
   fi
 fi
 
@@ -138,9 +138,7 @@ if test "x${enable_python:-yes}" = xyes; then
 fi
 
 AC_CHECK_PROG([PERL], [perl], [perl])
-# Debian has a binary for SWIG 3.0 named swig3.0 and they kept swig as
-# an alias for swig-2.0.  Let's use the former when available.
-AC_CHECK_PROGS([SWIG], [swig3.0 swig], [swig])
+AC_CHECK_PROGS([SWIG], [swig4.0 swig3.0 swig], [swig])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tests/pyrun], [chmod +x tests/pyrun])
