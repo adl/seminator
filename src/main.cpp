@@ -379,12 +379,10 @@ int main(int argc, char* argv[])
                   {
                     spot::twa_graph_ptr comp = nullptr;
                     spot::postprocessor postprocessor;
-                    // We don't deal with TBA: (1) complement_semidet() returns a
-                    // TBA, and (2) in Spot 2.8 spot::postprocessor only knows
-                    // about state-based BA and Transition-based GBA.  So TBA/TGBA
-                    // are simply simplified as TGBA.
                     postprocessor.set_type(desired_output == BA
                                            ? spot::postprocessor::BA
+                                           : desired_output == TBA
+                                           ? spot::postprocessor::Buchi
                                            : spot::postprocessor::TGBA);
                     if (!om.get("postprocess-comp", 1))
                       {

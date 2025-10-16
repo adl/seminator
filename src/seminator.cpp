@@ -114,34 +114,23 @@ private:
       {
       case ViaTGBA:
         if (!preproc_)
-          {
-            return input_;
-          }
+          return input_;
         preprocessor_.set_type(spot::postprocessor::TGBA);
-        return preprocessor_.run(input_);
+        break;
       case ViaTBA:
-        {
-          auto out = spot::degeneralize_tba(input_);
-          if (preproc_)
-            {
-              preprocessor_.set_type(spot::postprocessor::TGBA);
-              out = preprocessor_.run(out);
-            }
-          return out;
-        }
+        if (!preproc_)
+          return spot::degeneralize_tba(input_);
+        preprocessor_.set_type(spot::postprocessor::Buchi);
+        break;
       case ViaSBA:
         if (!preproc_)
-          {
-            return spot::degeneralize(input_);
-          }
-        else
-          {
-            preprocessor_.set_type(spot::postprocessor::BA);
-            return preprocessor_.run(input_);
-          }
+          return spot::degeneralize(input_);
+        preprocessor_.set_type(spot::postprocessor::BA);
+        break;
       default:
         assert(!"should not be reached");
       }
+    return preprocessor_.run(input_);
   }
 
   spot::twa_graph_ptr process_job(spot::twa_graph_ptr input)
@@ -182,34 +171,25 @@ private:
 
   spot::twa_graph_ptr postprocess_job(spot::twa_graph_ptr aut)
   {
-    if (postproc_)
-      {
-        postprocessor_.set_type(spot::postprocessor::TGBA);
-        aut = postprocessor_.run(aut);
-      }
-
     switch (output_)
       {
       case TBA:
-        aut = spot::degeneralize_tba(aut);
-        if (postproc_)
-          aut = postprocessor_.run(aut);
+        if (!postproc_)
+          return spot::degeneralize_tba(aut);
+        postprocessor_.set_type(spot::postprocessor::Buchi);
         break;
       case BA:
-        if (postproc_)
-          {
-            postprocessor_.set_type(spot::postprocessor::BA);
-            aut = postprocessor_.run(aut);
-          }
-        else
-          {
-            aut = spot::degeneralize(aut);
-          }
+        if (!postproc_)
+          return spot::degeneralize(aut);
+        postprocessor_.set_type(spot::postprocessor::BA);
         break;
       default:
+        if (!postproc_)
+          return aut;
+        postprocessor_.set_type(spot::postprocessor::TGBA);
         break;
       }
-    return aut;
+    return postprocessor_.run(aut);
   }
 
   spot::twa_graph_ptr input_;
